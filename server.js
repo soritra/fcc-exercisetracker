@@ -31,10 +31,13 @@ var exerciseSchema = new mongoose.Schema({
     required: true
   },
   duration: {
-    type: String,
+    type: Number,
     required: true
   },
-  date: Date
+  date: {
+    type: Date,
+    default: Date.now
+  }
 },{ usePushEach: true })
 
 var userSchema = new mongoose.Schema({
@@ -47,6 +50,10 @@ var userSchema = new mongoose.Schema({
 },{ usePushEach: true })
 
 var User = mongoose.model('User', userSchema)
+
+var isValidId = function (id) {
+  return mongoose.Types.ObjectId.isValid(id)
+}
 
 // Not found middleware
 /*app.use((req, res, next) => {
@@ -106,6 +113,13 @@ app.post('/api/exercise/add', function (req, res, next) {
     })
   }
 
+  var description = req.body.description
+  if (!description) {
+    return res.json({
+      msg: 'Description required'
+    })
+  }
+
   var duration = req.body.duration
   if (!duration) {
     return res.json({
@@ -115,8 +129,12 @@ app.post('/api/exercise/add', function (req, res, next) {
 
   const data = {
     description: req.body.description,
-    duration: duration,
-    date: req.body.date
+    duration: duration
+  }
+
+  var dt = req.body.date
+  if (dt) {
+    data.date = dt
   }
   /*User.update(
     { _id: uid },
@@ -135,6 +153,10 @@ app.post('/api/exercise/add', function (req, res, next) {
       }
     }
   )*/
+  if (!isValidId(uid)) {
+    return res.sendStatus(500).send('User id not valid').end()
+  }
+
   User.findOne({ _id: uid }, function(err, usrdoc) {
     if (err) {
       res.sendStatus(500).send('database error').end()
@@ -152,7 +174,7 @@ app.post('/api/exercise/add', function (req, res, next) {
         username: usrdoc.username,
         description: data.description,
         duration: data.duration,
-        date: data.date
+        date: data.date || Date.now
       }).end()
     } 
   })
@@ -165,8 +187,40 @@ const getHandler = function (req, res, next) {
       msg: 'user not found'
     })
   } else {
-    res.json({
-      msg: 'hoho'
+    const uid = query.userId
+    if (!isValidId(uid)) {
+      return res.json({
+        msg: 'User id not valid'
+      })
+    }
+    User.findOne({ _id: uid }, function(err, usrdoc) {
+      if (err) {
+        res.json({
+          msg: 'database error'
+        })
+      }
+
+      if (!usrdoc) {
+        res.json({
+          msg: 'user was not found'
+        })
+      } else {
+        //res.json(usrdoc)
+        var out = {
+          _id: usrdoc._id,
+          username: usrdoc.username,
+          count: usrdoc.__v,
+          log: []
+        }
+        usrdoc.exercises.forEach((row) => {
+          out.log.push({
+            description: row.description,
+            duration: parseInt(row.duration),
+            date: row.date ? row.date.toLocaleDateString("en-US", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : ''
+          })
+        })
+        res.json(out)
+      }
     })
   }
   
