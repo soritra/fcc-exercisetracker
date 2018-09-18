@@ -3,6 +3,12 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 
+/*
+var dateFormat = require('dateformat');
+var now = new Date();
+dateFormat(now, "dddd, mmmm dS, yyyy, h:MM:ss TT");
+ */
+
 const cors = require('cors')
 
 const mongoose = require('mongoose')
