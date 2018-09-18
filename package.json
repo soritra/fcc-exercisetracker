@@ -1,0 +1,37 @@
+{
+	"name": "fcc-api-challenge-exercise-tracker",
+	"version": "1.0.0",
+	"description": "FCC API Challenge",
+	"main": "server.js",
+	"scripts": {
+		"start": "node server.js",
+		"dev": "nodemon server.js"
+	},
+	"dependencies": {
+		"bluebird": "^3.5.2",
+		"body-parser": "^1.15.2",
+		"cors": "^2.8.1",
+		"dotenv": "^6.0.0",
+		"express": "^4.14.0",
+		"mongodb": "^2.2.14",
+		"mongoose": "^4.7.2",
+		"shortid": "^2.2.6"
+	},
+	"engines": {
+		"node": "8.x"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/soritra/fcc-exercisetracker"
+	},
+	"license": "",
+	"keywords": [
+		"node",
+		"express",
+		"tracker",
+		"freecodecamp"
+	],
+	"devDependencies": {
+		"nodemon": "^1.18.4"
+	}
+}
